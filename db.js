@@ -38,10 +38,10 @@ const updateBudget = (body) => {
 };
 
 const createItem = (body) => {
-  const { userId, budget, item, amount } = body;
+  const { userId, item, amount } = body;
   return query(
-    `INSERT INTO user (id, budget, item, amount) VALUES (?, ?, ?, ?)`,
-    [userId, budget, item, amount]
+    `INSERT INTO budget_items (user_id, item, amount) VALUES (?, ?, ?)`,
+    [userId, item, amount]
   );
 };
 

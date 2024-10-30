@@ -1,34 +1,34 @@
 const dotenv = require("dotenv");
-dotenv.config();
 const express = require("express");
 let supertokens = require("supertokens-node");
 let cors = require("cors");
 let Session = require("supertokens-node/recipe/session");
 let ThirdParty = require("supertokens-node/recipe/thirdparty");
+const EmailPassword = require("supertokens-node/recipe/emailpassword");
 let { middleware } = require("supertokens-node/framework/express");
 let {
   verifySession,
 } = require("supertokens-node/recipe/session/framework/express");
 
+dotenv.config();
+
 supertokens.init({
+  debug: true,
   framework: "express",
   supertokens: {
-    // try.supertokens.io is for demo purposes. Replace this with the address of your core instance (sign up on supertokens.io), or self host a core.
-    connectionURI:
-      process.env.SUPERTOKENS_CONNECTION_URI || "https://try.supertokens.io",
+    connectionURI: "http://localhost:3567",
     // apiKey: "IF YOU HAVE AN API KEY FOR THE CORE, ADD IT HERE",
   },
   appInfo: {
-    appName: "Expense Tracker",
+    appName: "Expense Management",
     apiDomain: "http://localhost:3001",
     websiteDomain: "http://localhost:3000",
   },
   recipeList: [
+    EmailPassword.init(),
     ThirdParty.init({
       signInAndUpFeature: {
         providers: [
-          // We have provided you with development keys which you can use for testing.
-          // IMPORTANT: Please replace them with your own OAuth keys for production use.
           {
             config: {
               thirdPartyId: "google",
@@ -61,6 +61,7 @@ app.use(
   cors({
     origin: "http://localhost:3000",
     allowedHeaders: ["content-type", ...supertokens.getAllCORSHeaders()],
+    methods: ["GET", "PUT", "POST", "DELETE"],
     credentials: true,
   })
 );
@@ -81,12 +82,14 @@ app.use(function (req, res, next) {
 });
 
 app.get("/get-user-info", verifySession(), async (req, res) => {
-  const userId = req.session.userId;
+  const userId = req.session.getUserId();
   // let userInfo = await ThirdPartyEmailPassword.getUserById(userId);
 });
 
 app.get("/data", verifySession(), async (req, res) => {
-  const userId = req.session.userId;
+  const userId = req.session.getUserId();
+  console.log(userId);
+
   database
     .getData(userId)
     .then((response) => {
