@@ -5,6 +5,11 @@ const AddExpenseForm = (props) => {
   const [amount, setAmount] = React.useState(0);
 
   const handleChanges = () => {
+    // if (props.budget === 0) {
+    //   alert("Số tiền quỹ của bạn không hợp lệ");
+    //   props.getDataForUser();
+
+    // }
     fetch("http://localhost:3001/create-item", {
       method: "POST",
       headers: {
@@ -12,7 +17,6 @@ const AddExpenseForm = (props) => {
       },
       body: JSON.stringify({
         userId: props.user,
-        budget: props.budget,
         item: item,
         amount: amount,
       }),

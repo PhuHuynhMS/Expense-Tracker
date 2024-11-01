@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
-dotenv.config();
 const mysql = require("mysql2");
+dotenv.config();
 
 const pool = mysql.createPool({
   host: process.env.DATABASE_HOST,
@@ -24,12 +24,20 @@ const query = (sql, params) => {
 };
 
 const getData = (userId) => {
-  return query(`SELECT * FROM user WHERE id = ?`, [userId]);
+  return query(
+    `SELECT * FROM user LEFT JOIN budget_items ON user.id = budget_items.user_id WHERE user.id = ?`,
+    [userId]
+  );
 };
 
 const createBudget = (body) => {
   const { userId, budget } = body;
   return query(`INSERT INTO user (id, budget) VALUES (?, ?)`, [userId, budget]);
+};
+
+const deleteBudgetItem = (body) => {
+  const { id_budget_item } = body;
+  return query(`DELETE FROM budget_items WHERE id = ?`, [id_budget_item]);
 };
 
 const updateBudget = (body) => {
@@ -50,4 +58,5 @@ module.exports = {
   createBudget,
   updateBudget,
   createItem,
+  deleteBudgetItem,
 };

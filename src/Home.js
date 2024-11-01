@@ -18,7 +18,7 @@ function Home() {
 
   //Get the budget and list of expenses for a user
   function getDataForUser() {
-    fetch(`http://localhost:3001/data`)
+    fetch("http://localhost:3001/data")
       .then((response) => {
         return response.json();
       })
@@ -29,14 +29,22 @@ function Home() {
         let totalAmount = 0;
         data.map((row) => {
           if (row.item && row.amount) {
-            let expense = { item: row.item, amount: parseInt(row.amount) };
+            let expense = {
+              id: row.id,
+              item: row.item,
+              amount: parseInt(row.amount),
+            };
             totalAmount += parseInt(row.amount);
             list.push(expense);
           }
+          return null;
         });
         setExpenseList(list);
         setTotalExpense(totalAmount);
         setRemainingAmount(data[0].budget - totalAmount);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
@@ -69,7 +77,10 @@ function Home() {
       <h3 className="mt-3">Expenses</h3>
       <div className="row mt-3">
         <div className="col-sm">
-          <ExpenseList expenseList={expenseList} />
+          <ExpenseList
+            expenseList={expenseList}
+            getDataForUser={getDataForUser}
+          />
         </div>
       </div>
       <h3 className="mt-3">Add Expense</h3>

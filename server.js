@@ -88,7 +88,6 @@ app.get("/get-user-info", verifySession(), async (req, res) => {
 
 app.get("/data", verifySession(), async (req, res) => {
   const userId = req.session.getUserId();
-  console.log(userId);
 
   database
     .getData(userId)
@@ -125,6 +124,17 @@ app.post("/update-budget", (req, res) => {
 app.post("/create-item", (req, res) => {
   database
     .createItem(req.body)
+    .then((response) => {
+      res.status(200).send(response);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
+
+app.delete("/delete-budget-item", (req, res) => {
+  database
+    .deleteBudgetItem(req.body)
     .then((response) => {
       res.status(200).send(response);
     })

@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React from "react";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import SuperTokens, { SuperTokensWrapper } from "supertokens-auth-react";
 import { getSuperTokensRoutesForReactRouterDom } from "supertokens-auth-react/ui";
 import ThirdParty, { Google } from "supertokens-auth-react/recipe/thirdparty";
@@ -6,19 +7,21 @@ import EmailPassword from "supertokens-auth-react/recipe/emailpassword";
 import Session, { SessionAuth } from "supertokens-auth-react/recipe/session";
 import { EmailPasswordPreBuiltUI } from "supertokens-auth-react/recipe/emailpassword/prebuiltui";
 import { ThirdPartyPreBuiltUI } from "supertokens-auth-react/recipe/thirdparty/prebuiltui";
+import { AuthRecipeComponentsOverrideContextProvider } from "supertokens-auth-react/ui";
+import logo from "./logo.png";
 
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "./Home";
 
 const PreBuiltUIList = [EmailPasswordPreBuiltUI, ThirdPartyPreBuiltUI];
-const ComponentWrapper = (props) => {
-  return props.children;
-};
+// const ComponentWrapper = (props) => {
+//   return props.children;
+// };
 
 SuperTokens.init({
   appInfo: {
-    appName: "Expense Tracker",
+    appName: "Expense Management",
     apiDomain: "http://localhost:3001",
     websiteDomain: "http://localhost:3000",
   },
@@ -28,36 +31,53 @@ SuperTokens.init({
         providers: [Google.init()],
       },
     }),
-    EmailPassword.init({}),
-
+    EmailPassword.init(),
     Session.init(),
   ],
 });
 
-function App() {
-  return (
-    <SuperTokensWrapper>
-      <ComponentWrapper>
-        <Router>
-          <Routes>
-            {getSuperTokensRoutesForReactRouterDom(
-              require("react-router-dom"),
-              PreBuiltUIList
-            )}
-            <Route
-              path="/"
-              element={
-                <SessionAuth>
-                  {/* Wrapping the component to make sure that only signed-in users can access this page */}
-                  <Home />
-                </SessionAuth>
-              }
-            />
-          </Routes>
-        </Router>
-      </ComponentWrapper>
-    </SuperTokensWrapper>
-  );
+class App extends React.Component {
+  render() {
+    return (
+      <SuperTokensWrapper>
+        {/* <ComponentWrapper> */}
+        <BrowserRouter>
+          <AuthRecipeComponentsOverrideContextProvider
+            components={{
+              AuthPageHeader_Override: ({ DefaultComponent, ...props }) => {
+                return (
+                  <div>
+                    <img src={logo} style={{ width: "100px" }} alt="wallet" />
+                    <h1 style={{ color: "#699cf0", fontWeight: 700 }}>
+                      Expense Management
+                    </h1>
+                    <DefaultComponent {...props} />
+                  </div>
+                );
+              },
+            }}
+          >
+            <Routes>
+              {getSuperTokensRoutesForReactRouterDom(
+                require("react-router-dom"),
+                PreBuiltUIList
+              )}
+              <Route
+                path="/"
+                element={
+                  <SessionAuth>
+                    {/* Wrapping the component to make sure that only signed-in users can access this page */}
+                    <Home />
+                  </SessionAuth>
+                }
+              />
+            </Routes>
+            {/* </ComponentWrapper> */}
+          </AuthRecipeComponentsOverrideContextProvider>
+        </BrowserRouter>
+      </SuperTokensWrapper>
+    );
+  }
 }
 
 export default App;

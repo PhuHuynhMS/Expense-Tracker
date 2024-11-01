@@ -1,17 +1,14 @@
-import React, { useEffect } from "react";
-import {
-  signOut,
-  redirectToAuth,
-} from "supertokens-auth-react/recipe/thirdparty";
+import React from "react";
+import { signOut } from "supertokens-auth-react/recipe/session";
 import "../App.css";
 
 function Header(props) {
   const [localBudget, setlocalBudget] = React.useState(0);
 
-  const handleSignOut = async () => {
+  async function onLogout() {
     await signOut();
-    redirectToAuth();
-  };
+    window.location.href = "/auth"; // or to wherever your logic page is
+  }
 
   function handleBudgetChange() {
     if (props.budget > 0) {
@@ -50,7 +47,7 @@ function Header(props) {
     <div>
       <div className="header">
         <h1 className="mt-3 text-ctn">Personal Expense Tracker</h1>
-        <button type="button" class="btn btn-dark mt-3" onClick={handleSignOut}>
+        <button type="button" class="btn btn-dark mt-3" onClick={onLogout}>
           Sign Out
         </button>
       </div>
