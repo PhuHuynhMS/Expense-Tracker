@@ -144,75 +144,75 @@ app.put("/update-profile", (req, res) => {
 });
 
 app.post("/change-password", verifySession(), async (req, res) => {
-  // get the supertokens session object from the req
-  let session = req.session;
-  let userId = req.session.getUserId();
-  console.log(userId);
+  try {
+    // get the supertokens session object from the req
+    let session = req.session;
+    let userId = req.session.getUserId();
+    console.log(userId);
 
-  // retrive the old password from the request body
-  let oldPassword = req.body.oldPassword;
+    // retrive the old password from the request body
+    let oldPassword = req.body.oldPassword;
 
-  // retrive the new password from the request body
-  let updatedPassword = req.body.newPassword;
+    // retrive the new password from the request body
+    let updatedPassword = req.body.newPassword;
 
-  // get the signed in user's email from the getUserById function
-  let userInfo = await supertokens.getUser(session.userId);
+    // get the signed in user's email from the getUserById function
+    let userInfo = await supertokens.getUser(session.userId);
 
-  if (userInfo === undefined) {
-    throw new Error("Should never come here");
-  }
+    if (userInfo === undefined) {
+      throw new Error("Should never come here");
+    }
 
-  let loginMethod = userInfo.loginMethods.find((lM) => {
-    console.log("LM: ", lM);
+    let loginMethod = userInfo.loginMethods.find((lM) => {
+      return (
+        lM.recipeUserId.getAsString() ===
+          session.getRecipeUserId().getAsString() &&
+        lM.recipeId === "emailpassword"
+      );
+    });
+    if (loginMethod === undefined) {
+      throw new Error("Should never come here");
+    }
 
-    console.log("session: ", session.getRecipeUserId());
-    return (
-      lM.recipeUserId.getAsString() ===
-        session.getRecipeUserId().getAsString() &&
-      lM.recipeId === "emailpassword"
+    if (loginMethod === undefined) {
+      throw new Error("Should never come here");
+    }
+    const email = loginMethod.email;
+
+    // call signin to check that input password is correct
+    let isPasswordValid = await EmailPassword.verifyCredentials(
+      session.getTenantId(),
+      email,
+      oldPassword
     );
-  });
-  if (loginMethod === undefined) {
-    throw new Error("Should never come here");
+
+    if (isPasswordValid.status !== "OK") {
+      res.status(400).send({ message: "Incorrect password" });
+      return;
+    }
+
+    // update the user's password using updateEmailOrPassword
+    let response = await EmailPassword.updateEmailOrPassword({
+      recipeUserId: session.getRecipeUserId(),
+      password: updatedPassword,
+      tenantIdForPasswordPolicy: session.getTenantId(),
+    });
+
+    if (response.status === "PASSWORD_POLICY_VIOLATED_ERROR") {
+      res.send(response);
+      return;
+    }
+
+    // revoke all sessions for the user
+    await Session.revokeAllSessionsForUser(userId);
+
+    // revoke the current user's session, we do this to remove the auth cookies, logging out the user on the frontend.
+    await req.session.revokeSession();
+
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(500).send(error);
   }
-
-  if (loginMethod === undefined) {
-    throw new Error("Should never come here");
-  }
-  const email = loginMethod.email;
-
-  // call signin to check that input password is correct
-  let isPasswordValid = await EmailPassword.verifyCredentials(
-    session.getTenantId(),
-    email,
-    oldPassword
-  );
-
-  if (isPasswordValid.status !== "OK") {
-    res.status(400).send("Incorrect password");
-    return;
-  }
-
-  // update the user's password using updateEmailOrPassword
-  let response = await EmailPassword.updateEmailOrPassword({
-    recipeUserId: session.getRecipeUserId(),
-    password: updatedPassword,
-    tenantIdForPasswordPolicy: session.getTenantId(),
-  });
-
-  if (response.status === "PASSWORD_POLICY_VIOLATED_ERROR") {
-    res.status(400).send(response);
-    return;
-  }
-
-  // revoke all sessions for the user
-  await Session.revokeAllSessionsForUser(userId);
-
-  // revoke the current user's session, we do this to remove the auth cookies, logging out the user on the frontend.
-  await req.session.revokeSession();
-
-  // TODO: send successful password update response
-  res.status(200).send(response);
 });
 
 app.delete("/delete-budget-item", (req, res) => {

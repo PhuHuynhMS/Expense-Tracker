@@ -46,9 +46,20 @@ function Profile() {
           />
         </div>
         <div className="mb-3">
-          <a href="/change-password" className="text-decoration-none">
-            Change password
-          </a>
+          {data.loginMethods[0].thirdParty.id === "google" ? (
+            <a
+              href="https://myaccount.google.com/security"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-decoration-none"
+            >
+              Change password
+            </a>
+          ) : (
+            <a href="/change-password" className="text-decoration-none">
+              Change password
+            </a>
+          )}
         </div>
         <button
           type="submit"
