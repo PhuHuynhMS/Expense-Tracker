@@ -30,16 +30,20 @@ const ExpenseList = (props) => {
         {props.expenseList.map((expense) => (
           <li className="list-group-item d-flex justify-content-between align-items-center">
             {expense.item}
-            <span className="badge bg-info badge-pill">{expense.amount}</span>
-            <button
-              type="button"
-              className="btn btn-danger btn-sm"
-              onClick={() => {
-                handleDeleteItem(expense);
-              }}
-            >
-              Delete
-            </button>
+            <div className="d-flex">
+              <div className="me-2 fw-bold d-flex align-items-center">
+                {expense.amount} VND
+              </div>
+              <button
+                type="button"
+                className="btn btn-danger btn-sm"
+                onClick={() => {
+                  handleDeleteItem(expense);
+                }}
+              >
+                Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>

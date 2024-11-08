@@ -12,7 +12,9 @@ import logo from "./logo.png";
 
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Home from "./Home";
+import Home from "../src/pages/Home";
+import Profile from "./pages/Profile";
+import ChangePassword from "./pages/ChangePassword";
 
 const PreBuiltUIList = [EmailPasswordPreBuiltUI, ThirdPartyPreBuiltUI];
 // const ComponentWrapper = (props) => {
@@ -68,6 +70,24 @@ class App extends React.Component {
                   <SessionAuth>
                     {/* Wrapping the component to make sure that only signed-in users can access this page */}
                     <Home />
+                  </SessionAuth>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <SessionAuth>
+                    {/* Wrapping the component to make sure that only signed-in users can access this page */}
+                    <Profile />
+                  </SessionAuth>
+                }
+              />
+              <Route
+                path="/change-password"
+                element={
+                  <SessionAuth>
+                    {/* Wrapping the component to make sure that only signed-in users can access this page */}
+                    <ChangePassword />
                   </SessionAuth>
                 }
               />

@@ -1,5 +1,7 @@
 const dotenv = require("dotenv");
 const express = require("express");
+const Dashboard = require("supertokens-node/recipe/dashboard");
+const UserRoles = require("supertokens-node/recipe/userroles");
 let supertokens = require("supertokens-node");
 let cors = require("cors");
 let Session = require("supertokens-node/recipe/session");
@@ -9,6 +11,7 @@ let { middleware } = require("supertokens-node/framework/express");
 let {
   verifySession,
 } = require("supertokens-node/recipe/session/framework/express");
+let { errorHandler } = require("supertokens-node/framework/express");
 
 dotenv.config();
 
@@ -44,6 +47,8 @@ supertokens.init({
       },
     }),
     Session.init(), // initializes session features
+    Dashboard.init(),
+    UserRoles.init(),
   ],
 });
 
@@ -68,8 +73,6 @@ app.use(
 
 app.use(middleware()); // middleware adds the signin and signup api endpoints to the express app
 
-let { errorHandler } = require("supertokens-node/framework/express");
-
 app.use(express.json());
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -81,22 +84,19 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.get("/get-user-info", verifySession(), async (req, res) => {
-  const userId = req.session.getUserId();
-  // let userInfo = await ThirdPartyEmailPassword.getUserById(userId);
-});
-
 app.get("/data", verifySession(), async (req, res) => {
-  const userId = req.session.getUserId();
+  try {
+    const userId = req.session.getUserId();
 
-  database
-    .getData(userId)
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
+    let userInfo = await supertokens.getUser(userId);
+    console.log(userId);
+
+    let response = await database.getData(userId);
+
+    res.status(200).send({ response, userInfo });
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
 app.post("/create-budget", (req, res) => {
@@ -130,6 +130,89 @@ app.post("/create-item", (req, res) => {
     .catch((error) => {
       res.status(500).send(error);
     });
+});
+
+app.put("/update-profile", (req, res) => {
+  database
+    .updateProfile(req.body)
+    .then((response) => {
+      res.status(200).send(response);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
+
+app.post("/change-password", verifySession(), async (req, res) => {
+  // get the supertokens session object from the req
+  let session = req.session;
+  let userId = req.session.getUserId();
+  console.log(userId);
+
+  // retrive the old password from the request body
+  let oldPassword = req.body.oldPassword;
+
+  // retrive the new password from the request body
+  let updatedPassword = req.body.newPassword;
+
+  // get the signed in user's email from the getUserById function
+  let userInfo = await supertokens.getUser(session.userId);
+
+  if (userInfo === undefined) {
+    throw new Error("Should never come here");
+  }
+
+  let loginMethod = userInfo.loginMethods.find((lM) => {
+    console.log("LM: ", lM);
+
+    console.log("session: ", session.getRecipeUserId());
+    return (
+      lM.recipeUserId.getAsString() ===
+        session.getRecipeUserId().getAsString() &&
+      lM.recipeId === "emailpassword"
+    );
+  });
+  if (loginMethod === undefined) {
+    throw new Error("Should never come here");
+  }
+
+  if (loginMethod === undefined) {
+    throw new Error("Should never come here");
+  }
+  const email = loginMethod.email;
+
+  // call signin to check that input password is correct
+  let isPasswordValid = await EmailPassword.verifyCredentials(
+    session.getTenantId(),
+    email,
+    oldPassword
+  );
+
+  if (isPasswordValid.status !== "OK") {
+    res.status(400).send("Incorrect password");
+    return;
+  }
+
+  // update the user's password using updateEmailOrPassword
+  let response = await EmailPassword.updateEmailOrPassword({
+    recipeUserId: session.getRecipeUserId(),
+    password: updatedPassword,
+    tenantIdForPasswordPolicy: session.getTenantId(),
+  });
+
+  if (response.status === "PASSWORD_POLICY_VIOLATED_ERROR") {
+    res.status(400).send(response);
+    return;
+  }
+
+  // revoke all sessions for the user
+  await Session.revokeAllSessionsForUser(userId);
+
+  // revoke the current user's session, we do this to remove the auth cookies, logging out the user on the frontend.
+  await req.session.revokeSession();
+
+  // TODO: send successful password update response
+  res.status(200).send(response);
 });
 
 app.delete("/delete-budget-item", (req, res) => {

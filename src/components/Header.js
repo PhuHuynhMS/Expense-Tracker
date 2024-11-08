@@ -1,23 +1,31 @@
 import React from "react";
 import { signOut } from "supertokens-auth-react/recipe/session";
 import "../App.css";
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faWallet } from "@fortawesome/free-solid-svg-icons";
 
 function Header(props) {
   const [localBudget, setlocalBudget] = React.useState(0);
-
+  const navigate = useNavigate();
   async function onLogout() {
     await signOut();
-    window.location.href = "/auth"; // or to wherever your logic page is
+    window.location.href = "/auth";
   }
 
   function handleBudgetChange() {
-    if (props.budget > 0) {
+    if (localBudget <= 0) {
+      alert("Budget must be greater than 0");
+    } else if (props.budget > 0) {
       fetch("http://localhost:3001/update-budget", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ budget: localBudget, userId: props.user }),
+        body: JSON.stringify({
+          budget: parseFloat(localBudget),
+          userId: props.user,
+        }),
       })
         .then((response) => {
           return response.text();
@@ -32,7 +40,10 @@ function Header(props) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ budget: localBudget, userId: props.user }),
+        body: JSON.stringify({
+          budget: parseFloat(localBudget),
+          userId: props.user,
+        }),
       })
         .then((response) => {
           return response.text();
@@ -43,35 +54,66 @@ function Header(props) {
         });
     }
   }
+
+  function goToProfilePage() {
+    navigate("/profile", {
+      state: props.profile,
+    });
+  }
+
   return (
     <div>
-      <div className="header">
-        <h1 className="mt-3 text-ctn">Personal Expense Tracker</h1>
-        <button type="button" class="btn btn-dark mt-3" onClick={onLogout}>
-          Sign Out
-        </button>
-      </div>
-      <div className="input-ctn">
-        <form>
-          <div class="form-group">
-            <label for="budget">Add/Update Budget</label>
-            <input
-              class="form-control"
-              placeholder="Budget"
-              value={localBudget}
-              onChange={(e) => setlocalBudget(e.target.value)}
-            ></input>
+      <nav className="shadow-lg navbar bg-body-tertiary">
+        <div className="container-fluid">
+          <a href="/" className="navbar-brand">
+            <FontAwesomeIcon
+              icon={faWallet}
+              size="2xl"
+              style={{ color: "#2c9cf2", marginRight: "10px" }}
+            />
+            Personal Expense Tracker
+          </a>
+          <div className="d-flex">
+            <button
+              className="btn bg-transparent"
+              onClick={() => goToProfilePage(props.profile)}
+            >
+              <FontAwesomeIcon icon={faUser} />
+            </button>
+            <button
+              className="btn btn-outline-danger"
+              type="button"
+              onClick={onLogout}
+            >
+              Sign Out
+            </button>
           </div>
-          <button
-            type="button"
-            class="btn btn-dark mt-3"
-            onClick={() => {
-              handleBudgetChange();
-            }}
-          >
-            Save Budget
-          </button>
-        </form>
+        </div>
+      </nav>
+      <div className="container mt-5">
+        <div className="input-ctn">
+          <form>
+            <div class="form-group">
+              <label for="budget">Add/Update Budget</label>
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Budget"
+                value={localBudget}
+                onChange={(e) => setlocalBudget(e.target.value)}
+              ></input>
+            </div>
+            <button
+              type="button"
+              class="btn btn-dark mt-3"
+              onClick={() => {
+                handleBudgetChange();
+              }}
+            >
+              Save Budget
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
