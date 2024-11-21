@@ -5,6 +5,42 @@ function ChangePassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmedPassword, setConfirmedPassword] = useState("");
 
+  function updatePassword() {
+    if (newPassword !== confirmedPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    fetch("http://localhost:3001/change-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        newPassword: newPassword,
+        oldPassword: oldPassword,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message) {
+          alert(data.message);
+        }
+        if (data.status === "OK") {
+          alert("Password updated successfully");
+          window.location.href = "/auth";
+        }
+        if (data.status === "PASSWORD_POLICY_VIOLATED_ERROR") {
+          alert(
+            "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number."
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Failed to update password. Please try again.");
+      });
+  }
+
   return (
     <div>
       <ProfileHeader />
@@ -41,41 +77,7 @@ function ChangePassword() {
         <button
           type="submit"
           class="btn btn-primary"
-          onClick={() => {
-            if (newPassword !== confirmedPassword) {
-              alert("Passwords do not match");
-              return;
-            }
-            fetch("http://localhost:3001/change-password", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                newPassword: newPassword,
-                oldPassword: oldPassword,
-              }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.message) {
-                  alert(data.message);
-                }
-                if (data.status === "OK") {
-                  alert("Password updated successfully");
-                  window.location.href = "/auth";
-                }
-                if (data.status === "PASSWORD_POLICY_VIOLATED_ERROR") {
-                  alert(
-                    "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number."
-                  );
-                }
-              })
-              .catch((error) => {
-                console.error("Error:", error);
-                alert("Failed to update password. Please try again.");
-              });
-          }}
+          onClick={() => updatePassword}
         >
           Update
         </button>

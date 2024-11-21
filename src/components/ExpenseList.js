@@ -1,9 +1,23 @@
 import React from "react";
-
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
 const ExpenseList = (props) => {
+  function handleClick(expense) {
+    withReactContent(Swal).fire({
+      show: true,
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      preConfirm: () => {
+        handleDeleteItem(expense);
+      },
+    });
+  }
   const handleDeleteItem = (expense) => {
-    console.log(expense);
-
     fetch("http://localhost:3001/delete-budget-item", {
       method: "DELETE",
       headers: {
@@ -17,7 +31,6 @@ const ExpenseList = (props) => {
         return response.text();
       })
       .then((data) => {
-        alert(data);
         props.getDataForUser();
       })
       .catch((error) => {
@@ -37,9 +50,7 @@ const ExpenseList = (props) => {
               <button
                 type="button"
                 className="btn btn-danger btn-sm"
-                onClick={() => {
-                  handleDeleteItem(expense);
-                }}
+                onClick={() => handleClick(expense)}
               >
                 Delete
               </button>

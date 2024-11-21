@@ -99,7 +99,7 @@ app.get("/data", verifySession(), async (req, res) => {
   }
 });
 
-app.post("/create-budget", (req, res) => {
+app.post("/create-budget", verifySession(), (req, res) => {
   database
     .createBudget(req.body)
     .then((response) => {
@@ -110,7 +110,7 @@ app.post("/create-budget", (req, res) => {
     });
 });
 
-app.post("/update-budget", (req, res) => {
+app.post("/update-budget", verifySession(), (req, res) => {
   database
     .updateBudget(req.body)
     .then((response) => {
@@ -121,7 +121,7 @@ app.post("/update-budget", (req, res) => {
     });
 });
 
-app.post("/create-item", (req, res) => {
+app.post("/create-item", verifySession(), (req, res) => {
   database
     .createItem(req.body)
     .then((response) => {
@@ -132,7 +132,7 @@ app.post("/create-item", (req, res) => {
     });
 });
 
-app.put("/update-profile", (req, res) => {
+app.put("/update-profile", verifySession(), (req, res) => {
   database
     .updateProfile(req.body)
     .then((response) => {
@@ -215,7 +215,7 @@ app.post("/change-password", verifySession(), async (req, res) => {
   }
 });
 
-app.delete("/delete-budget-item", (req, res) => {
+app.delete("/delete-budget-item", verifySession(), (req, res) => {
   database
     .deleteBudgetItem(req.body)
     .then((response) => {
