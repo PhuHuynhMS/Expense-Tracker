@@ -11,10 +11,12 @@ import { AuthRecipeComponentsOverrideContextProvider } from "supertokens-auth-re
 import logo from "./logo.png";
 
 import "./App.css";
+import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Home from "../src/pages/Home";
 import Profile from "./pages/Profile";
 import ChangePassword from "./pages/ChangePassword";
+import VerifyEmail from "./pages/VerifyEmail";
 
 const PreBuiltUIList = [EmailPasswordPreBuiltUI, ThirdPartyPreBuiltUI];
 // const ComponentWrapper = (props) => {
@@ -91,7 +93,17 @@ class App extends React.Component {
                   </SessionAuth>
                 }
               />
+              <Route
+                path="/auth/verify-email"
+                element={
+                  <>
+                    {/* Wrapping the component to make sure that only signed-in users can access this page */}
+                    <VerifyEmail />
+                  </>
+                }
+              />
             </Routes>
+
             {/* </ComponentWrapper> */}
           </AuthRecipeComponentsOverrideContextProvider>
         </BrowserRouter>

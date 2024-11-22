@@ -8,6 +8,9 @@ import { faUser, faWallet } from "@fortawesome/free-solid-svg-icons";
 function Header(props) {
   const [localBudget, setlocalBudget] = React.useState(0);
   const navigate = useNavigate();
+
+  console.log(props.profile);
+
   async function onLogout() {
     await signOut();
     window.location.href = "/auth";

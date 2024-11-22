@@ -1,11 +1,20 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import ProfileHeader from "../components/ProfileHeader";
+import { ToastContainer, toast } from "react-toastify";
 
 function Profile() {
   const location = useLocation();
   const data = location.state;
   let dataEmails;
+
+  let googleLogin = false;
+
+  if (data.thirdParty.length > 0) {
+    if (data.thirdParty[0].id === "google") {
+      googleLogin = true;
+    }
+  }
 
   if (data.emails) {
     dataEmails = data.emails;
@@ -13,22 +22,31 @@ function Profile() {
   const [email, setEmail] = useState(dataEmails[0] ?? "");
 
   function updateProfile(email) {
-    fetch("http://localhost:3001/update-profile", {
+    fetch("http://localhost:3001/change-email", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId: data.userId,
         email: email,
       }),
-    })
-      .then((response) => {
-        return response.text();
-      })
-      .then((data) => {
-        alert(data);
-      });
+    }).then((response) => {
+      if (response.status === 200) {
+        response.text().then((message) => {
+          toast.success(message, {
+            theme: "colored",
+            position: "top-center",
+          });
+        });
+      } else if (response.status === 400) {
+        response.text().then((message) => {
+          toast.error(message, {
+            theme: "colored",
+            position: "top-center",
+          });
+        });
+      }
+    });
   }
 
   return (
@@ -44,13 +62,13 @@ function Profile() {
             type="email"
             class="form-control"
             id="email"
-            defaultValue={email}
+            defaultValue={email ?? ""}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
         <div className="mb-3">
-          {data.loginMethods[0].thirdParty.id === "google" ? (
+          {googleLogin ? (
             <a
               href="https://myaccount.google.com/security"
               target="_blank"
@@ -73,6 +91,7 @@ function Profile() {
           Update
         </button>
       </div>
+      <ToastContainer />
     </div>
   );
 }

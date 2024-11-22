@@ -7,6 +7,10 @@ let cors = require("cors");
 let Session = require("supertokens-node/recipe/session");
 let ThirdParty = require("supertokens-node/recipe/thirdparty");
 const EmailPassword = require("supertokens-node/recipe/emailpassword");
+const EmailVerification = require("supertokens-node/recipe/emailverification");
+const {
+  isEmailChangeAllowed,
+} = require("supertokens-node/recipe/accountlinking");
 let { middleware } = require("supertokens-node/framework/express");
 let {
   verifySession,
@@ -29,6 +33,28 @@ supertokens.init({
   },
   recipeList: [
     EmailPassword.init(),
+    EmailVerification.init({
+      mode: "REQUIRED",
+      override: {
+        apis: (oI) => {
+          return {
+            ...oI,
+            verifyEmailPOST: async function (input) {
+              let response = await oI.verifyEmailPOST(input);
+              if (response.status === "OK") {
+                // This will update the email of the user to the one
+                // that was just marked as verified by the token.
+                await EmailPassword.updateEmailOrPassword({
+                  recipeUserId: response.user.recipeUserId,
+                  email: response.user.email,
+                });
+              }
+              return response;
+            },
+          };
+        },
+      },
+    }),
     ThirdParty.init({
       signInAndUpFeature: {
         providers: [
@@ -89,7 +115,6 @@ app.get("/data", verifySession(), async (req, res) => {
     const userId = req.session.getUserId();
 
     let userInfo = await supertokens.getUser(userId);
-    console.log(userId);
 
     let response = await database.getData(userId);
 
@@ -224,6 +249,123 @@ app.delete("/delete-budget-item", verifySession(), (req, res) => {
     .catch((error) => {
       res.status(500).send(error);
     });
+});
+
+app.post("/change-email", verifySession(), async (req, res) => {
+  let session = req.session;
+  let email = req.body.email;
+
+  // validate the input email
+  if (!isValidEmail(email)) {
+    return res.status(400).send("Email is invalid");
+  }
+
+  // Then, we check if the email is verified for this user ID or not.
+  // It is important to understand that SuperTokens stores email verification
+  // status based on the user ID AND the email, and not just the email.
+  let isVerified = await EmailVerification.isEmailVerified(
+    session.getRecipeUserId(),
+    email
+  );
+
+  if (!isVerified) {
+    if (
+      !(await isEmailChangeAllowed(session.getRecipeUserId(), email, false))
+    ) {
+      // this can come here if you have enabled the account linking feature, and
+      // if there is a security risk in changing this user's email.
+      return res
+        .status(400)
+        .send("Email change not allowed. Please contact support");
+    }
+
+    // Before sending a verification email, we check if the email is already
+    // being used by another user. If it is, we throw an error.
+    let user = await supertokens.getUser(session.getUserId());
+    for (let i = 0; i < user.tenantIds.length; i++) {
+      let usersWithSameEmail = await supertokens.listUsersByAccountInfo(
+        user.tenantIds[i],
+        {
+          email,
+        }
+      );
+      for (let y = 0; y < usersWithSameEmail.length; y++) {
+        // Since one user can be shared across many tenants, we need to check if
+        // the email already exists in any of the tenants that belongs to this user.
+        let currUser = usersWithSameEmail[y];
+        if (currUser?.id !== session.getUserId()) {
+          // TODO handle error, email already exists with another user.
+          res.status(400).send("Email already exists with another user");
+          return;
+        }
+      }
+    }
+
+    // Now we create and send the email verification link to the user for the new email.
+    await EmailVerification.sendEmailVerificationEmail(
+      session.getTenantId(),
+      session.getUserId(),
+      session.getRecipeUserId(),
+      email
+    );
+
+    // TODO send successful response that email verification email sent.
+    res.status(200).send("Email verification email sent");
+    return;
+  }
+
+  console.log("user ID: ", session.getRecipeUserId());
+
+  // Since the email is verified, we try and do an update
+  let resp = await EmailPassword.updateEmailOrPassword({
+    recipeUserId: session.getRecipeUserId(),
+    email: email,
+  });
+
+  if (resp.status === "OK") {
+    // TODO send successful response that email updated.
+    res.status(200).send("Email updated");
+    return;
+  }
+  if (resp.status === "EMAIL_ALREADY_EXISTS_ERROR") {
+    // TODO handle error, email already exists with another user.
+    res.status(400).send("Email already exists with another user");
+    return;
+  }
+
+  throw new Error("Should never come here");
+});
+
+function isValidEmail(email) {
+  let regexp = new RegExp(
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+  return regexp.test(email);
+}
+
+app.post("/auth/verify-email", async (req, res) => {
+  const { token, tenantId } = req.body;
+
+  try {
+    console.log(token, tenantId);
+
+    // Kiểm tra nếu token hợp lệ và thực hiện xác minh
+    let response = await EmailVerification.verifyEmailUsingToken(
+      tenantId,
+      token
+    );
+
+    if (response.status === "OK") {
+      res.status(200).send({ message: "Email verified successfully." });
+    } else {
+      res
+        .status(400)
+        .send({ message: "Invalid or expired verification token." });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error verifying email." });
+  }
 });
 
 app.use(errorHandler());

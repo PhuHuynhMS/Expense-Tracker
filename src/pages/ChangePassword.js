@@ -77,7 +77,7 @@ function ChangePassword() {
         <button
           type="submit"
           class="btn btn-primary"
-          onClick={() => updatePassword}
+          onClick={() => updatePassword()}
         >
           Update
         </button>
