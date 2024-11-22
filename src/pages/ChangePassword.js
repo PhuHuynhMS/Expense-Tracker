@@ -1,5 +1,8 @@
 import { useState } from "react";
 import ProfileHeader from "../components/ProfileHeader";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
+import { ToastContainer, toast } from "react-toastify";
 function ChangePassword() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -21,18 +24,28 @@ function ChangePassword() {
       }),
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then(async (data) => {
         if (data.message) {
-          alert(data.message);
+          toast.error(data.message, {
+            position: "top-center",
+            theme: "colored",
+          });
         }
         if (data.status === "OK") {
-          alert("Password updated successfully");
+          await withReactContent(Swal).fire({
+            show: true,
+            title: "Password updated successfully",
+            icon: "success",
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: "OK",
+          });
           window.location.href = "/auth";
         }
         if (data.status === "PASSWORD_POLICY_VIOLATED_ERROR") {
-          alert(
-            "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number."
-          );
+          toast.error("Password must be at least 8 characters long", {
+            position: "top-center",
+            theme: "colored",
+          });
         }
       })
       .catch((error) => {
@@ -82,6 +95,7 @@ function ChangePassword() {
           Update
         </button>
       </div>
+      <ToastContainer />
     </div>
   );
 }

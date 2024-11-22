@@ -4,6 +4,7 @@ import "../App.css";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faWallet } from "@fortawesome/free-solid-svg-icons";
+import { ToastContainer, toast } from "react-toastify";
 
 function Header(props) {
   const [localBudget, setlocalBudget] = React.useState(0);
@@ -18,7 +19,10 @@ function Header(props) {
 
   function handleBudgetChange() {
     if (localBudget <= 0) {
-      alert("Budget must be greater than 0");
+      toast.error("Budget must be greater than 0", {
+        theme: "colored",
+        position: "top-center",
+      });
     } else if (props.budget > 0) {
       fetch("http://localhost:3001/update-budget", {
         method: "POST",
@@ -118,6 +122,7 @@ function Header(props) {
           </form>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }
