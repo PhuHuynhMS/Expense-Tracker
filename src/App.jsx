@@ -10,6 +10,7 @@ import { ThirdPartyPreBuiltUI } from "supertokens-auth-react/recipe/thirdparty/p
 import { AuthRecipeComponentsOverrideContextProvider } from "supertokens-auth-react/ui";
 import EmailVerification from "supertokens-auth-react/recipe/emailverification";
 import { EmailVerificationPreBuiltUI } from "supertokens-auth-react/recipe/emailverification/prebuiltui";
+import { ToastContainer } from "react-toastify";
 
 import logo from "./logo.png";
 import "./App.css";
@@ -118,6 +119,7 @@ class App extends React.Component {
             {/* </ComponentWrapper> */}
           </AuthRecipeComponentsOverrideContextProvider>
         </BrowserRouter>
+        <ToastContainer />
       </SuperTokensWrapper>
     );
   }

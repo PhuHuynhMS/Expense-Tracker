@@ -23,11 +23,10 @@ const query = (sql, params) => {
   });
 };
 
-const getData = async (userId) => {
+const getData = async () => {
   const budget = await query(`SELECT * FROM user`);
 
   const budgetItems = await query(`SELECT * FROM budget_items`);
-  console.log(budgetItems);
 
   const data = {
     budget: budget[0].budget,
@@ -38,7 +37,7 @@ const getData = async (userId) => {
 };
 
 const createBudget = (body) => {
-  const { userId, budget } = body;
+  const { budget } = body;
   return query(`INSERT INTO user (budget) VALUES (?)`, [budget]);
 };
 
@@ -47,9 +46,11 @@ const deleteBudgetItem = (body) => {
   return query(`DELETE FROM budget_items WHERE id = ?`, [id_budget_item]);
 };
 
-const updateBudget = (body) => {
-  const { budget, userId } = body;
-  return query(`UPDATE user SET budget = ? WHERE id = ?`, [budget, userId]);
+const updateBudget = async (body) => {
+  const { budget } = body;
+  const dbBudget = await query(`SELECT * FROM user`);
+  const budgetId = dbBudget[0].id;
+  return query(`UPDATE user SET budget = ? WHERE id = ?`, [budget, budgetId]);
 };
 
 const createItem = (body) => {

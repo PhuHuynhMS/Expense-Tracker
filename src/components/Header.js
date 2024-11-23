@@ -4,7 +4,7 @@ import "../App.css";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faWallet } from "@fortawesome/free-solid-svg-icons";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 function Header(props) {
   const [localBudget, setlocalBudget] = React.useState(0);
@@ -31,14 +31,22 @@ function Header(props) {
           budget: parseFloat(localBudget),
           userId: props.user,
         }),
-      })
-        .then((response) => {
-          return response.text();
-        })
-        .then((data) => {
-          alert(data);
-          props.getDataForUser();
-        });
+      }).then(async (response) => {
+        const data = await response.json();
+
+        if (data.message === "invalid claim") {
+          toast.error("You have no permission to update the budget", {
+            theme: "colored",
+            position: "top-center",
+          });
+        } else {
+          toast.success("Budget updated successfully", {
+            theme: "colored",
+            position: "top-center",
+          });
+        }
+        props.getDataForUser();
+      });
     } else {
       fetch("http://localhost:3001/create-budget", {
         method: "POST",
@@ -49,14 +57,22 @@ function Header(props) {
           budget: parseFloat(localBudget),
           userId: props.user,
         }),
-      })
-        .then((response) => {
-          return response.text();
-        })
-        .then((data) => {
-          alert(data);
-          props.getDataForUser();
-        });
+      }).then(async (response) => {
+        const data = await response.json();
+
+        if (data.message === "invalid claim") {
+          toast.error("You have no permission to create the budget", {
+            theme: "colored",
+            position: "top-center",
+          });
+        } else {
+          toast.success("Budget created successfully", {
+            theme: "colored",
+            position: "top-center",
+          });
+        }
+        props.getDataForUser();
+      });
     }
   }
 
@@ -119,7 +135,6 @@ function Header(props) {
           </form>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 }

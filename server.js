@@ -116,8 +116,7 @@ app.get("/data", verifySession(), async (req, res) => {
 
     let userInfo = await supertokens.getUser(userId);
 
-    let response = await database.getData(userId);
-    console.log(response);
+    let response = await database.getData();
 
     res.status(200).send({ response, userInfo });
   } catch (error) {
@@ -125,27 +124,47 @@ app.get("/data", verifySession(), async (req, res) => {
   }
 });
 
-app.post("/create-budget", verifySession(), (req, res) => {
-  database
-    .createBudget(req.body)
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
-});
+app.post(
+  "/create-budget",
+  verifySession({
+    overrideGlobalClaimValidators: async (globalValidators) => [
+      ...globalValidators,
+      UserRoles.UserRoleClaim.validators.includes("Manager"),
+      // UserRoles.PermissionClaim.validators.includes("edit")
+    ],
+  }),
+  (req, res) => {
+    database
+      .createBudget(req.body)
+      .then((response) => {
+        res.status(200).send(response);
+      })
+      .catch((error) => {
+        res.status(500).send(error);
+      });
+  }
+);
 
-app.post("/update-budget", verifySession(), (req, res) => {
-  database
-    .updateBudget(req.body)
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
-});
+app.post(
+  "/update-budget",
+  verifySession({
+    overrideGlobalClaimValidators: async (globalValidators) => [
+      ...globalValidators,
+      UserRoles.UserRoleClaim.validators.includes("Manager"),
+      // UserRoles.PermissionClaim.validators.includes("edit")
+    ],
+  }),
+  (req, res) => {
+    database
+      .updateBudget(req.body)
+      .then((response) => {
+        res.status(200).send(response);
+      })
+      .catch((error) => {
+        res.status(500).send(error);
+      });
+  }
+);
 
 app.post("/create-item", verifySession(), (req, res) => {
   database
@@ -241,7 +260,16 @@ app.post("/change-password", verifySession(), async (req, res) => {
   }
 });
 
-app.delete("/delete-budget-item", verifySession(), (req, res) => {
+app.delete("/delete-budget-item", verifySession(), async (req, res) => {
+  const userId = req.session.getUserId();
+  const itemUserId = req.body.userId;
+
+  const response = await UserRoles.getRolesForUser("public", userId);
+  const roles = response.roles;
+
+  if (!roles.includes("Manager") && itemUserId !== userId) {
+    return res.status(400).send("You are not allowed to delete this item");
+  }
   database
     .deleteBudgetItem(req.body)
     .then((response) => {

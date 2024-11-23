@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 const ExpenseList = (props) => {
-  const [userInfoMap, setUserInfoMap] = useState({}); // Lưu trữ thông tin người dùng theo userId
-
+  const [userInfoMap, setUserInfoMap] = useState({});
   const fetchUserInfo = async (userId) => {
     if (userInfoMap[userId]) {
       return;
@@ -47,12 +47,22 @@ const ExpenseList = (props) => {
       },
       body: JSON.stringify({
         id_budget_item: expense.id,
+        user_id: expense.userId,
       }),
     })
-      .then((response) => response.text())
-      .then((_data) => {
-        props.getDataForUser(); // Tải lại danh sách chi tiêu sau khi xóa
+      .then(async (response) => {
+        if (response.status === 400) {
+          const data = await response.text();
+          toast.error(data, {
+            position: "top-center",
+            theme: "colored",
+          });
+          return false;
+        }
+        props.getDataForUser();
+        return true;
       })
+
       .catch((error) => {
         console.log(error);
       });
@@ -72,12 +82,12 @@ const ExpenseList = (props) => {
       })
       .then((result) => {
         if (result.isConfirmed) {
-          handleDeleteItem(expense);
-          withReactContent(Swal).fire(
-            "Deleted!",
-            "Your file has been deleted.",
-            "success"
-          );
+          const isdeleted = handleDeleteItem(expense);
+          if (!isdeleted) return;
+          toast.success("Deleted successfully", {
+            position: "top-center",
+            theme: "colored",
+          });
         }
       });
   };

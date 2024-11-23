@@ -32,6 +32,8 @@ const AddExpenseForm = (props) => {
           amount: amount,
         }),
       }).then((response) => {
+        console.log(response);
+
         if (response.status !== 200) {
           toast.error("Error creating item", {
             position: "top-center",
