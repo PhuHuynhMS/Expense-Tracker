@@ -39,6 +39,40 @@ const ExpenseList = (props) => {
     });
   }, [props.expenseList]);
 
+  const DeleteAll = (expense) => {
+    fetch("http://localhost:3001/delete-all", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (response) => {
+        const data = await response.json();
+
+        if (data.message === "invalid claim") {
+          toast.error("You have no permission to delete all", {
+            position: "top-center",
+            theme: "colored",
+          });
+          return false;
+        }
+
+        if (response.status === 200) {
+          toast.success("Deleted successfully", {
+            position: "top-center",
+            theme: "colored",
+          });
+          return false;
+        }
+        props.getDataForUser();
+        return true;
+      })
+
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const handleDeleteItem = (expense) => {
     fetch("http://localhost:3001/delete-budget-item", {
       method: "DELETE",
@@ -96,6 +130,11 @@ const ExpenseList = (props) => {
     <div className="expense-list container mt-4">
       <h2 className="text-center mb-4 text-primary">Expense List</h2>
       <ul className="list-group">
+        <li className="text-end mb-3">
+          <button className="btn btn-danger btn-sm" onClick={DeleteAll}>
+            Delete All
+          </button>
+        </li>
         {props.expenseList.map((expense) => (
           <li
             className="list-group-item d-flex justify-content-between align-items-center p-3 mb-2 shadow-sm"

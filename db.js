@@ -46,6 +46,10 @@ const deleteBudgetItem = (body) => {
   return query(`DELETE FROM budget_items WHERE id = ?`, [id_budget_item]);
 };
 
+const deleteAll = () => {
+  return query(`DELETE FROM budget_items WHERE 1 = 1`);
+};
+
 const updateBudget = async (body) => {
   const { budget } = body;
   const dbBudget = await query(`SELECT * FROM user`);
@@ -67,4 +71,5 @@ module.exports = {
   updateBudget,
   createItem,
   deleteBudgetItem,
+  deleteAll,
 };

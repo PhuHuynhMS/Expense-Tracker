@@ -78,6 +78,17 @@ app.post("/change-password", verifySession(), controller.changePassword);
 
 app.delete("/delete-budget-item", verifySession(), controller.deleteBudgetItem);
 
+app.delete(
+  "/delete-all",
+  verifySession({
+    overrideGlobalClaimValidators: async (globalValidators) => [
+      ...globalValidators,
+      UserRoles.UserRoleClaim.validators.includes("Manager"),
+    ],
+  }),
+  controller.deleteAll
+);
+
 app.post("/change-email", verifySession(), controller.changeEmail);
 
 app.post("/auth/verify-email", controller.verifyEmail);

@@ -139,7 +139,7 @@ exports.changePassword = async (req, res) => {
 
 exports.deleteBudgetItem = async (req, res) => {
   const userId = req.session.getUserId();
-  const itemUserId = req.body.userId;
+  const itemUserId = req.body.user_id;
 
   const response = await UserRoles.getRolesForUser("public", userId);
   const roles = response.roles;
@@ -272,4 +272,15 @@ exports.getUserInfo = async (req, res) => {
   } catch (error) {
     res.status(500).send(error);
   }
+};
+
+exports.deleteAll = (req, res) => {
+  database
+    .deleteAll()
+    .then((response) => {
+      res.status(200).send(response);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
 };
