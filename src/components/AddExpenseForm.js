@@ -53,38 +53,44 @@ const AddExpenseForm = (props) => {
   };
 
   return (
-    <form onSubmit={handleChanges}>
-      <div className="row">
-        <div className="col-sm">
-          <label for="name">Name</label>
+    <form onSubmit={handleChanges} className="shadow-sm p-4 bg-white rounded">
+      <h5 className="text-center mb-4">Add New Expense</h5>
+      <div className="row g-3">
+        <div className="col-sm-6">
+          <label htmlFor="name" className="form-label">
+            Name
+          </label>
           <input
             type="text"
             className="form-control"
             id="name"
+            placeholder="Enter item name"
             value={item}
             onChange={(e) => setItem(e.target.value)}
-          ></input>
+          />
         </div>
-        <div className="col-sm">
-          <label for="cost">Cost</label>
+        <div className="col-sm-6">
+          <label htmlFor="cost" className="form-label">
+            Cost (VND)
+          </label>
           <input
-            required="required"
-            type="text"
+            type="number"
             className="form-control"
             id="cost"
+            placeholder="Enter cost"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-          ></input>
+          />
         </div>
       </div>
-      <div className="row">
-        <div className="col-sm">
-          <button type="submit" className="btn btn-primary mt-3">
-            Save
+      <div className="row mt-4">
+        <div className="col text-center">
+          <button type="submit" className="btn btn-primary">
+            Save Expense
           </button>
         </div>
-        <ToastContainer />
       </div>
+      <ToastContainer />
     </form>
   );
 };

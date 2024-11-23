@@ -23,16 +23,23 @@ const query = (sql, params) => {
   });
 };
 
-const getData = (userId) => {
-  return query(
-    `SELECT * FROM user LEFT JOIN budget_items ON user.id = budget_items.user_id WHERE user.id = ?`,
-    [userId]
-  );
+const getData = async (userId) => {
+  const budget = await query(`SELECT * FROM user`);
+
+  const budgetItems = await query(`SELECT * FROM budget_items`);
+  console.log(budgetItems);
+
+  const data = {
+    budget: budget[0].budget,
+    budgetItems: budgetItems,
+  };
+
+  return data;
 };
 
 const createBudget = (body) => {
   const { userId, budget } = body;
-  return query(`INSERT INTO user (id, budget) VALUES (?, ?)`, [userId, budget]);
+  return query(`INSERT INTO user (budget) VALUES (?)`, [budget]);
 };
 
 const deleteBudgetItem = (body) => {

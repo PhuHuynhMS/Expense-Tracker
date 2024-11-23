@@ -8,8 +8,10 @@ import Session, { SessionAuth } from "supertokens-auth-react/recipe/session";
 import { EmailPasswordPreBuiltUI } from "supertokens-auth-react/recipe/emailpassword/prebuiltui";
 import { ThirdPartyPreBuiltUI } from "supertokens-auth-react/recipe/thirdparty/prebuiltui";
 import { AuthRecipeComponentsOverrideContextProvider } from "supertokens-auth-react/ui";
-import logo from "./logo.png";
+import EmailVerification from "supertokens-auth-react/recipe/emailverification";
+import { EmailVerificationPreBuiltUI } from "supertokens-auth-react/recipe/emailverification/prebuiltui";
 
+import logo from "./logo.png";
 import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -18,7 +20,11 @@ import Profile from "./pages/Profile";
 import ChangePassword from "./pages/ChangePassword";
 import VerifyEmail from "./pages/VerifyEmail";
 
-const PreBuiltUIList = [EmailPasswordPreBuiltUI, ThirdPartyPreBuiltUI];
+const PreBuiltUIList = [
+  EmailPasswordPreBuiltUI,
+  ThirdPartyPreBuiltUI,
+  EmailVerificationPreBuiltUI,
+];
 // const ComponentWrapper = (props) => {
 //   return props.children;
 // };
@@ -34,6 +40,9 @@ SuperTokens.init({
       signInAndUpFeature: {
         providers: [Google.init()],
       },
+    }),
+    EmailVerification.init({
+      mode: "REQUIRED", // or "OPTIONAL"
     }),
     EmailPassword.init(),
     Session.init(),
@@ -66,6 +75,7 @@ class App extends React.Component {
                 require("react-router-dom"),
                 PreBuiltUIList
               )}
+
               <Route
                 path="/"
                 element={
@@ -75,6 +85,7 @@ class App extends React.Component {
                   </SessionAuth>
                 }
               />
+
               <Route
                 path="/profile"
                 element={

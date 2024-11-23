@@ -10,8 +10,6 @@ function Header(props) {
   const [localBudget, setlocalBudget] = React.useState(0);
   const navigate = useNavigate();
 
-  console.log(props.profile);
-
   async function onLogout() {
     await signOut();
     window.location.href = "/auth";
@@ -70,52 +68,51 @@ function Header(props) {
 
   return (
     <div>
-      <nav className="shadow-lg navbar bg-body-tertiary">
+      <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div className="container-fluid">
-          <a href="/" className="navbar-brand">
+          <a href="/" className="navbar-brand d-flex align-items-center">
             <FontAwesomeIcon
               icon={faWallet}
               size="2xl"
-              style={{ color: "#2c9cf2", marginRight: "10px" }}
+              className="me-2"
+              style={{ color: "#2c9cf2" }}
             />
-            Personal Expense Tracker
+            <span className="fw-bold fs-5">Expense Tracker</span>
           </a>
-          <div className="d-flex">
+          <div className="d-flex align-items-center">
             <button
-              className="btn bg-transparent"
+              className="btn btn-light me-2"
               onClick={() => goToProfilePage(props.profile)}
             >
-              <FontAwesomeIcon icon={faUser} />
+              <FontAwesomeIcon icon={faUser} size="lg" />
             </button>
-            <button
-              className="btn btn-outline-danger"
-              type="button"
-              onClick={onLogout}
-            >
+            <button className="btn btn-danger" type="button" onClick={onLogout}>
               Sign Out
             </button>
           </div>
         </div>
       </nav>
-      <div className="container mt-5">
-        <div className="input-ctn">
-          <form>
-            <div class="form-group">
-              <label for="budget">Add/Update Budget</label>
+      <div className="container mt-4">
+        <div className="card shadow-sm p-4">
+          <h5 className="card-title text-center">Manage Your Budget</h5>
+          <form className="mt-3">
+            <div className="form-group mb-3">
+              <label htmlFor="budget" className="form-label">
+                Add or Update Budget
+              </label>
               <input
                 type="number"
-                class="form-control"
-                placeholder="Budget"
+                id="budget"
+                className="form-control"
+                placeholder="Enter your budget"
                 value={localBudget}
                 onChange={(e) => setlocalBudget(e.target.value)}
-              ></input>
+              />
             </div>
             <button
               type="button"
-              class="btn btn-dark mt-3"
-              onClick={() => {
-                handleBudgetChange();
-              }}
+              className="btn btn-primary w-100"
+              onClick={() => handleBudgetChange()}
             >
               Save Budget
             </button>

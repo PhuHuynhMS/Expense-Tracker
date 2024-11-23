@@ -117,6 +117,7 @@ app.get("/data", verifySession(), async (req, res) => {
     let userInfo = await supertokens.getUser(userId);
 
     let response = await database.getData(userId);
+    console.log(response);
 
     res.status(200).send({ response, userInfo });
   } catch (error) {
@@ -365,6 +366,18 @@ app.post("/auth/verify-email", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send({ message: "Error verifying email." });
+  }
+});
+
+app.get("/get-user-info/:userId", verifySession(), async (req, res) => {
+  try {
+    let userId = req.params.userId;
+
+    let userInfo = await supertokens.getUser(userId);
+
+    res.status(200).send(userInfo);
+  } catch (error) {
+    res.status(500).send(error);
   }
 });
 
