@@ -40,7 +40,7 @@ function Header(props) {
             position: "top-center",
           });
           return;
-        } else if (data.status !== 200) {
+        } else if (data.affectedRows === 0) {
           toast.error("Error updating budget", {
             theme: "colored",
             position: "top-center",

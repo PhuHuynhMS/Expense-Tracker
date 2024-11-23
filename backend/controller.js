@@ -73,7 +73,6 @@ exports.changePassword = async (req, res) => {
   try {
     let session = req.session;
     let userId = req.session.getUserId();
-    console.log(userId);
 
     let oldPassword = req.body.oldPassword;
 
