@@ -6,7 +6,6 @@ let Session = require("supertokens-node/recipe/session");
 let ThirdParty = require("supertokens-node/recipe/thirdparty");
 
 const supertokensConfig = {
-  debug: true,
   framework: "express",
   supertokens: {
     connectionURI: "http://localhost:3567",

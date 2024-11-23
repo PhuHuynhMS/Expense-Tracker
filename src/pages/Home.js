@@ -4,6 +4,7 @@ import Record from "../components/Record";
 import ExpenseList from "../components/ExpenseList";
 import AddExpenseForm from "../components/AddExpenseForm";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
+import { doesSessionExist } from "supertokens-auth-react/recipe/session";
 
 function Home() {
   let { userId } = useSessionContext(); // Getting user details from session context
@@ -24,6 +25,7 @@ function Home() {
         return response.json();
       })
       .then((data) => {
+        console.log(data);
         if (data["response"].budget) {
           setBudget(parseInt(data["response"].budget));
           let list = [];

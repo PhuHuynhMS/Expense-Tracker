@@ -39,11 +39,19 @@ function Header(props) {
             theme: "colored",
             position: "top-center",
           });
+          return;
+        } else if (data.status !== 200) {
+          toast.error("Error updating budget", {
+            theme: "colored",
+            position: "top-center",
+          });
+          return;
         } else {
           toast.success("Budget updated successfully", {
             theme: "colored",
             position: "top-center",
           });
+          setlocalBudget(0);
         }
         props.getDataForUser();
       });
@@ -70,6 +78,7 @@ function Header(props) {
             theme: "colored",
             position: "top-center",
           });
+          setlocalBudget(0);
         }
         props.getDataForUser();
       });
