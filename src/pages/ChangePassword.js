@@ -58,7 +58,7 @@ function ChangePassword() {
     <div>
       <ProfileHeader />
       <div className="container col-md-4 mt-5">
-        <h1 className="text-center">Change Password</h1>
+        <h1 className="text-center text-light">Change Password</h1>
         <div class="mb-3">
           <input
             type="password"
