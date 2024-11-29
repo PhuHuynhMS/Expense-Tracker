@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+# Expense Tracker - Secure and Efficient Expense Management  
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Expense Tracker is a robust application designed to help users manage their personal and shared expenses with ease and security. Integrated with **SuperTokens**, the app ensures seamless authentication and role-based access control for a highly secure and user-friendly experience.  
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Key Features  
+- **Expense Tracking:** Log daily expenses with categorized entries for better financial visibility.  
+- **Budget Management:** Set and manage budgets to track spending and stay within limits.  
+- **Shared Expenses:** Collaborate with others to track shared expenses and manage group finances.  
+- **Role-Based Access Control:**  
+  - **Managers:** Create and update budgets.  
+  - **Contributors:** Add or update individual expense entries under predefined budgets.  
+- **Secure Authentication:**  
+  - User login and registration powered by SuperTokens for enhanced security.  
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Tech Stack  
+- **Frontend:** React for an intuitive.  
+- **Backend:** Node.js for scalable server-side logic.  
+- **Authentication:** SuperTokens for secure and efficient user authentication.  
+- **Database:** MySQL.  
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## SuperTokens Integration Highlights  
+1. **Session Management:** Maintain secure sessions with SuperTokens' robust session handling.  
+2. **Role-Based Routing:** Protect routes based on user roles (e.g., redirect admins to specific dashboards).  
+3. **Secure APIs:** Use SuperTokens middleware to guard backend APIs against unauthorized access.
+4. **Authentication:** Authenticating with Email/Password or Google.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## Getting Started  
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Prerequisites  
+- Install Node.js and npm/yarn.  
+- Set up a SuperTokens account for authentication integration.  
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Steps  
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. Clone the repository:  
+   ```bash
+   git clone https://github.com/PhuHuynhMS/Expense-Tracker
+2. Navigate to the project directory:
+   ```bash
+   cd expense-tracker
+3. Install dependencies:
+   ```bash
+   npm install
+4. Configure environment variables:
+   - Backend: Add SuperTokens keys and database credentials to .env file.
+   - Frontend: Update API endpoint and SuperTokens app info in .env file.
+5. Start the development server:
+   - Backend:
+     ```bash
+     node server.js
+  - Frontend:
+    ```bash
+    npm start
