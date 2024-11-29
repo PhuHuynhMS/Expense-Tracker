@@ -54,8 +54,8 @@ Expense Tracker is a robust application designed to help users manage their pers
    - Frontend: Update API endpoint and SuperTokens app info in .env file.
 5. Start the development server:
    - Backend:
-     ```bash
-     node server.js
+   ```bash
+    node server.js
   - Frontend:
     ```bash
     npm start
